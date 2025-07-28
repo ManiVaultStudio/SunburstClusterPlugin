@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="sunburst_plot">
+        <file>sunburst/d3.v7.min.js</file>
+        <file>sunburst/d3.sunburst.js</file>
+        <file>sunburst/sunburst.tools.js</file>
+        <file>sunburst/sunburst.css</file>
+        <file>sunburst/sunburst.html</file>
+    </qresource>
+    <qresource prefix="sunburst_plot">
+        <file>js_libs/qwebchannel.tools.js</file>
+    </qresource>
+</RCC>
