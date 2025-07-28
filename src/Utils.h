@@ -12,8 +12,15 @@
 #include <QVector>
 #include <QJsonObject>
 
+// Use std::execution if available
 #if !defined(__clang__) && (defined(__GNUC__) || defined(_MSC_VER))
+#if defined(__GNUC__)  // both TBB and Qt define emit keyword
+#undef emit
+#endif
 #include <execution>
+#if defined(__GNUC__)
+#define emit
+#endif
 #ifdef NDEBUG
 #define SUN_PARALLEL_EXECUTION std::execution::par,
 #else
