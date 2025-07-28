@@ -4,7 +4,10 @@
 
 #include <Dataset.h>
 #include <ViewPlugin.h>
- 
+
+#include <PointData/PointData.h>
+#include <ClusterData/ClusterData.h>
+
 #include <memory>
 #include <vector>
 
@@ -21,8 +24,6 @@ namespace mv {
 // View
 // =============================================================================
 
-class Points;
-class Clusters;
 
 class SunburstSettings;
 class SunburstWidget;
