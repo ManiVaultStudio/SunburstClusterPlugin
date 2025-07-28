@@ -18,12 +18,9 @@ class SunburstClusterPluginConan(ConanFile):
 
     name = "SunburstClusterPlugin"
     description = (
-        """ManiVault Plugin that offers a SunburstClusterNotebook Server.
-        An API is included which provides access ManiVault data
-        allowing the data to be processed in the notebook and
-        returned to the data tree. """
+        """ManiVault Plugin for sunburst diagrams. """
     )
-    topics = ("hdps", "plugin", "data", "dimensionality reduction")
+    topics = ("hdps", "plugin", "data", "sunburst")
     url = "https://github.com/ManiVaultStudio/SunburstClusterPlugin"
     author = "B. van Lew b.van_lew@lumc.nl"  # conan recipe author
     license = "MIT"
