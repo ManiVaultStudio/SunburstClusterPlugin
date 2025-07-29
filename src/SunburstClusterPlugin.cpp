@@ -51,7 +51,7 @@ void SunburstClusterPlugin::init()
     // Create layout
     QVBoxLayout* layout = new QVBoxLayout();
     
-    _settingsWidget    = new SunburstSettings(*this);
+    _settingsWidget    = new SunburstSettings(this);
     _dropWidget        = new gui::DropWidget(_sunburstWidget);
     auto& pluginWidget = getWidget();
 

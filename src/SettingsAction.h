@@ -6,8 +6,6 @@
 #include <actions/ToggleAction.h>
 #include <actions/WidgetAction.h>
 
-class SunburstClusterPlugin;
-
 class SunburstSettings : public mv::gui::WidgetAction
 {
 protected:
@@ -22,7 +20,7 @@ protected:
     };
 
 public:
-    SunburstSettings(SunburstClusterPlugin& sunburstPlugin);
+    SunburstSettings(QObject* parent);
 
 private slots:
 
@@ -42,20 +40,10 @@ public: // Action getters
 
 public: // Serialization
 
-    /**
-     * Load plugin from variant map
-     * @param Variant map representation of the plugin
-     */
     void fromVariantMap(const QVariantMap& variantMap) override;
-
-    /**
-     * Save plugin to variant map
-     * @return Variant map representation of the plugin
-     */
     QVariantMap toVariantMap() const override;
 
 private:
-    SunburstClusterPlugin&      _sunburstPlugin;
     mv::gui::StringAction       _dataNameAction;
     mv::gui::ToggleAction       _sunburstPlotZoomOption;
     mv::gui::ToggleAction       _crossLevelSelectionOption;

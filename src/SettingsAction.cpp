@@ -7,9 +7,8 @@
 using namespace mv;
 using namespace mv::gui;
 
-SunburstSettings::SunburstSettings(SunburstClusterPlugin& sunburstPlugin) :
-    _sunburstPlugin(sunburstPlugin),
-    WidgetAction(&sunburstPlugin, "Sunburst settings"),
+SunburstSettings::SunburstSettings(QObject* parent) :
+    WidgetAction(parent, "Sunburst settings"),
     _dataNameAction(this, "Dataset"),
     _sunburstPlotZoomOption(this, "Zoom on click", false),
     _crossLevelSelectionOption(this, "Select in base data", false),
