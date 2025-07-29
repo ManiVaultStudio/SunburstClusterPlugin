@@ -33,7 +33,10 @@ using namespace mv;
 
 SunburstClusterPlugin::SunburstClusterPlugin(const PluginFactory* factory) :
     ViewPlugin(factory),
-    _loadDialog(std::make_unique<LoadDialog>(nullptr))
+    _sunburstWidget(new SunburstWidget()),
+    _settingsWidget(new SunburstSettings(this)),
+    _loadDialog(std::make_unique<LoadDialog>(nullptr)),
+    _dropWidget(new gui::DropWidget(_sunburstWidget))
 { 
     connect(_loadDialog.get(), &LoadDialog::accepted, this, &SunburstClusterPlugin::loadDataImpl);
 }
@@ -45,16 +48,13 @@ SunburstClusterPlugin::~SunburstClusterPlugin()
 void SunburstClusterPlugin::init()
 {
     // Load webpage
-    _sunburstWidget = new SunburstWidget();
     _sunburstWidget->setPage(":sunburst_plot/sunburst/sunburst.html", "qrc:/sunburst_plot/sunburst/");     // set html contents of webpage
+
+    auto& pluginWidget = getWidget();
 
     // Create layout
     QVBoxLayout* layout = new QVBoxLayout();
     
-    _settingsWidget    = new SunburstSettings(this);
-    _dropWidget        = new gui::DropWidget(_sunburstWidget);
-    auto& pluginWidget = getWidget();
-
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
@@ -178,6 +178,7 @@ void SunburstClusterPlugin::loadData(const mv::Datasets& datasets)
     _settingsWidget->getPointDataSetGUIDAction().setString(_currentPointDataSet->getId());
     _settingsWidget->getClusterDataSetsGUIDAction().setStrings(clusterDataGuids);
 
+    // Closing the dialog (positively) will call loadDataImpl()
     _loadDialog->setClusterSetNames(clusterDataNames);
     _loadDialog->show();
 }
@@ -385,8 +386,6 @@ QVariantMap SunburstClusterPlugin::toVariantMap() const
 
     _settingsWidget->insertIntoVariantMap(variantMap);
     _loadDialog->insertIntoVariantMap(variantMap);
-
-    _loadDialog->getOptionsAction().insertIntoVariantMap(variantMap);
 
     return variantMap;
 }
