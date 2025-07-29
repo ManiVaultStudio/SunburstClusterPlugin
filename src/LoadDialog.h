@@ -6,9 +6,12 @@
 #include <util/Serializable.h>
 
 #include <QDialog>
+#include <QList>
 #include <QSize>
 #include <QStringList>
 #include <QWidget>
+
+#include <cstdint>
 
 // =============================================================================
 // Loading input box
@@ -21,6 +24,14 @@ class LoadDialog : public QDialog, public mv::util::Serializable
 public:
     LoadDialog(QWidget* parent);
 
+public: // Setter
+
+    void setClusterSetNames(const QStringList& clusterSetNames);
+
+public: // Getter
+
+    QStringList getClusterSetNames() const;
+    QList<std::int32_t> getClusterOptionIndices() const;
 
     mv::gui::OptionsAction& getOptionsAction() { 
         return _clusterSetSelectionAction; 
@@ -40,12 +51,9 @@ public: // Serialization
 
     void fromVariantMap(const QVariantMap& variantMap) override;
     QVariantMap toVariantMap() const override;
-    void setClusterSetNames(const QStringList& clusterSetNames);
-    QStringList getClusterSetNames();
-    QList<std::int32_t> getClusterOptionIndices();
 
 protected:
-    mv::gui::OptionsAction      _clusterSetSelectionAction;     /** Data type action */
-    mv::gui::GroupAction        _groupAction;                   /** Data type action */
+    mv::gui::OptionsAction      _clusterSetSelectionAction;
+    mv::gui::GroupAction        _groupAction;
     mv::gui::TriggerAction      _okButton;
 };

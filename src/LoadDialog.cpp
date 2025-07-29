@@ -7,6 +7,7 @@ using namespace mv::gui;
 
 LoadDialog::LoadDialog(QWidget* parent) :
     QDialog(parent),
+    util::Serializable("Load Settings Dialog"),
     _clusterSetSelectionAction(this, "Cluster sets", {}, {}),
     _okButton(this, "Ok"),
     _groupAction(this, "Load Settings")
@@ -41,11 +42,11 @@ void LoadDialog::setClusterSetNames(const QStringList& clusterSetNames) {
     _clusterSetSelectionAction.selectAll();
 }
 
-QStringList LoadDialog::getClusterSetNames() {
+QStringList LoadDialog::getClusterSetNames() const {
     return _clusterSetSelectionAction.getSelectedOptions();
 }
 
-QList<std::int32_t> LoadDialog::getClusterOptionIndices() {
+QList<std::int32_t> LoadDialog::getClusterOptionIndices() const {
     return _clusterSetSelectionAction.getSelectedOptionIndices();
 }
 
