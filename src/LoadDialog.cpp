@@ -15,6 +15,9 @@ LoadDialog::LoadDialog(QWidget* parent) :
     setWindowTitle(tr("Sunburst input data"));
     setModal(true);
 
+    // OptionsActions does not save all options to a project by default, but we need it to
+    _clusterSetSelectionAction.setSerializeAllOptions(true);
+
     _groupAction.addAction(&_clusterSetSelectionAction);
 
     auto layout = new QGridLayout();
