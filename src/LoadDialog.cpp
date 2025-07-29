@@ -48,3 +48,26 @@ QStringList LoadDialog::getClusterSetNames() {
 QList<std::int32_t> LoadDialog::getClusterOptionIndices() {
     return _clusterSetSelectionAction.getSelectedOptionIndices();
 }
+
+void LoadDialog::fromVariantMap(const QVariantMap& variantMap) {
+    
+    qDebug() << variantMap;
+
+    util::Serializable::fromVariantMap(variantMap);
+
+    _clusterSetSelectionAction.fromParentVariantMap(variantMap);
+    _groupAction.fromParentVariantMap(variantMap);
+    _okButton.fromParentVariantMap(variantMap);
+}
+
+QVariantMap LoadDialog::toVariantMap() const {
+    QVariantMap variantMap = util::Serializable::toVariantMap();
+
+    _clusterSetSelectionAction.insertIntoVariantMap(variantMap);
+    _groupAction.insertIntoVariantMap(variantMap);
+    _okButton.insertIntoVariantMap(variantMap);
+
+    qDebug() << variantMap;
+
+    return variantMap;
+}

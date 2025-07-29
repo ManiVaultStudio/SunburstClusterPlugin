@@ -133,6 +133,8 @@ void SunburstClusterPlugin::loadDataImpl()
     if (!_sunburstWidget->isWebPageLoaded())
         return;
 
+    _dropWidget->setShowDropIndicator(false);
+
     QList<std::int32_t> selectionClusterData = _loadDialog->getClusterOptionIndices();
 
     if (selectionClusterData.size() != _currentClusterDataSets.size()) {
@@ -146,12 +148,6 @@ void SunburstClusterPlugin::loadDataImpl()
         std::swap(_currentClusterDataSets, filtered);
     }
 
-    // save data guid for serialization
-    //_settingsWidget->getDataGUIDAction().setString(_currentPointDataSet->getId());
-
-    // display data name 
-    //_settingsWidget->getDataNameLabel().setText(_currentPointDataSet->text());
-
     // parse data to JS in a different thread as to not block the UI
     QFuture<void> fvoid = QtConcurrent::run(&SunburstClusterPlugin::plotSunburn, this);
 
@@ -164,19 +160,23 @@ void SunburstClusterPlugin::loadData(const mv::Datasets& datasets)
     if (datasets.isEmpty())
         return;
 
-    _dropWidget->setShowDropIndicator(false);
-
     _currentPointDataSet = datasets.first();
     _currentClusterDataSets.clear();
 
     QStringList clusterDataNames;
+    QStringList clusterDataGuids;
 
     for (const auto& childDataset : _currentPointDataSet->getChildren()) {
         if (childDataset->getDataType() == ClusterType) {
             _currentClusterDataSets.append(childDataset);
             clusterDataNames.append(childDataset->getGuiName());
+            clusterDataGuids.append(childDataset->getId());
         }
     }
+
+    // Save data guids for serialization
+    _settingsWidget->getPointDataSetGUIDAction().setString(_currentPointDataSet->getId());
+    _settingsWidget->getClusterDataSetsGUIDAction().setStrings(clusterDataGuids);
 
     _loadDialog->setClusterSetNames(clusterDataNames);
     _loadDialog->show();
@@ -362,6 +362,21 @@ void SunburstClusterPlugin::fromVariantMap(const QVariantMap& variantMap)
     ViewPlugin::fromVariantMap(variantMap);
 
     _settingsWidget->fromParentVariantMap(variantMap);
+    _loadDialog->fromParentVariantMap(variantMap);
+
+    _currentPointDataSet = mv::data().getDataset<Points>(_settingsWidget->getPointDataSetGUIDAction().getString());
+
+    for (const auto& clusterDataGuid : _settingsWidget->getClusterDataSetsGUIDAction().getStrings()) {
+        _currentClusterDataSets.emplace_back(mv::data().getDataset<Clusters>(clusterDataGuid));
+    }
+
+    // capture the connection by value and define a mutable lambda which removes the connection
+    QMetaObject::Connection conn;
+    conn = QObject::connect(_sunburstWidget, &gui::WebWidget::webPageFullyLoaded, [this, conn]() mutable {
+        // Disconnect this connection
+        QObject::disconnect(conn);
+        loadDataImpl();
+        });
 }
 
 QVariantMap SunburstClusterPlugin::toVariantMap() const
@@ -369,6 +384,9 @@ QVariantMap SunburstClusterPlugin::toVariantMap() const
     QVariantMap variantMap = ViewPlugin::toVariantMap();
 
     _settingsWidget->insertIntoVariantMap(variantMap);
+    _loadDialog->insertIntoVariantMap(variantMap);
+
+    _loadDialog->getOptionsAction().insertIntoVariantMap(variantMap);
 
     return variantMap;
 }

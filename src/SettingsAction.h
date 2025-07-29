@@ -2,6 +2,7 @@
 #pragma once
 
 #include <actions/StringAction.h>
+#include <actions/StringsAction.h>
 #include <actions/ToggleAction.h>
 #include <actions/WidgetAction.h>
 
@@ -36,6 +37,8 @@ public: // Action getters
     mv::gui::StringAction& getDataNameAction() { return _dataNameAction; }
     mv::gui::ToggleAction& getPlotZoomOption() { return _sunburstPlotZoomOption; }
     mv::gui::ToggleAction& getCrossLevelSelectionOption() { return _crossLevelSelectionOption; }
+    mv::gui::StringAction& getPointDataSetGUIDAction() { return _pointDataSetGUID; }
+    mv::gui::StringsAction& getClusterDataSetsGUIDAction() { return _clusterDataSetsGUID; }
 
 public: // Serialization
 
@@ -56,4 +59,6 @@ private:
     mv::gui::StringAction       _dataNameAction;
     mv::gui::ToggleAction       _sunburstPlotZoomOption;
     mv::gui::ToggleAction       _crossLevelSelectionOption;
+    mv::gui::StringAction       _pointDataSetGUID;              // Used for serialization
+    mv::gui::StringsAction      _clusterDataSetsGUID;           // Used for serialization
 };
