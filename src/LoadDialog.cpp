@@ -51,9 +51,6 @@ QList<std::int32_t> LoadDialog::getClusterOptionIndices() const {
 }
 
 void LoadDialog::fromVariantMap(const QVariantMap& variantMap) {
-    
-    qDebug() << variantMap;
-
     util::Serializable::fromVariantMap(variantMap);
 
     _clusterSetSelectionAction.fromParentVariantMap(variantMap);
@@ -67,8 +64,6 @@ QVariantMap LoadDialog::toVariantMap() const {
     _clusterSetSelectionAction.insertIntoVariantMap(variantMap);
     _groupAction.insertIntoVariantMap(variantMap);
     _okButton.insertIntoVariantMap(variantMap);
-
-    qDebug() << variantMap;
 
     return variantMap;
 }
