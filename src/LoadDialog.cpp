@@ -7,12 +7,16 @@ using namespace mv::gui;
 
 LoadDialog::LoadDialog(QWidget* parent) :
     QDialog(parent),
+    util::Serializable("Load Settings Dialog"),
     _clusterSetSelectionAction(this, "Cluster sets", {}, {}),
     _okButton(this, "Ok"),
     _groupAction(this, "Load Settings")
 {
     setWindowTitle(tr("Sunburst input data"));
     setModal(true);
+
+    // OptionsActions does not save all options to a project by default, but we need it to
+    _clusterSetSelectionAction.setSerializeAllOptions(true);
 
     _groupAction.addAction(&_clusterSetSelectionAction);
 
@@ -41,10 +45,28 @@ void LoadDialog::setClusterSetNames(const QStringList& clusterSetNames) {
     _clusterSetSelectionAction.selectAll();
 }
 
-QStringList LoadDialog::getClusterSetNames() {
+QStringList LoadDialog::getClusterSetNames() const {
     return _clusterSetSelectionAction.getSelectedOptions();
 }
 
-QList<std::int32_t> LoadDialog::getClusterOptionIndices() {
+QList<std::int32_t> LoadDialog::getClusterOptionIndices() const {
     return _clusterSetSelectionAction.getSelectedOptionIndices();
+}
+
+void LoadDialog::fromVariantMap(const QVariantMap& variantMap) {
+    util::Serializable::fromVariantMap(variantMap);
+
+    _clusterSetSelectionAction.fromParentVariantMap(variantMap);
+    _groupAction.fromParentVariantMap(variantMap);
+    _okButton.fromParentVariantMap(variantMap);
+}
+
+QVariantMap LoadDialog::toVariantMap() const {
+    QVariantMap variantMap = util::Serializable::toVariantMap();
+
+    _clusterSetSelectionAction.insertIntoVariantMap(variantMap);
+    _groupAction.insertIntoVariantMap(variantMap);
+    _okButton.insertIntoVariantMap(variantMap);
+
+    return variantMap;
 }

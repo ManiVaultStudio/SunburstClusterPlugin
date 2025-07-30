@@ -7,15 +7,16 @@
 using namespace mv;
 using namespace mv::gui;
 
-SunburstSettings::SunburstSettings(SunburstClusterPlugin& sunburstPlugin) :
-    WidgetAction(&sunburstPlugin, "Settings"),
-    _sunburstPlugin(sunburstPlugin),
+SunburstSettings::SunburstSettings(QObject* parent) :
+    WidgetAction(parent, "Sunburst settings"),
     _dataNameAction(this, "Dataset"),
     _sunburstPlotZoomOption(this, "Zoom on click", false),
-    _crossLevelSelectionOption(this, "Select in base data", false)
+    _crossLevelSelectionOption(this, "Select in base data", false),
+    _pointDataSetGUID(this, "Points data set GUI"),
+    _clusterDataSetsGUID(this, "Cluster data sets GUI")
 {
-    setText("Settings");
-    setSerializationName("Settings");
+    setText("Sunburst settings");
+    setSerializationName("Sunburst settings");
 
     _dataNameAction.setDefaultWidgetFlags(StringAction::WidgetFlag::Label);
 
@@ -29,6 +30,8 @@ void SunburstSettings::fromVariantMap(const QVariantMap& variantMap)
     _crossLevelSelectionOption.fromParentVariantMap(variantMap);
     _sunburstPlotZoomOption.fromParentVariantMap(variantMap);
     _dataNameAction.fromParentVariantMap(variantMap);
+    _pointDataSetGUID.fromParentVariantMap(variantMap);
+    _clusterDataSetsGUID.fromParentVariantMap(variantMap);
 }
 
 QVariantMap SunburstSettings::toVariantMap() const
@@ -38,6 +41,8 @@ QVariantMap SunburstSettings::toVariantMap() const
     _crossLevelSelectionOption.insertIntoVariantMap(variantMap);
     _sunburstPlotZoomOption.insertIntoVariantMap(variantMap);
     _dataNameAction.insertIntoVariantMap(variantMap);
+    _pointDataSetGUID.insertIntoVariantMap(variantMap);
+    _clusterDataSetsGUID.insertIntoVariantMap(variantMap);
 
     return variantMap;
 }
