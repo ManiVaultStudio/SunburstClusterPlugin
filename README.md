@@ -38,3 +38,6 @@ To open the plot:
   Hovering over a partition will show a tooltip with the full hierarchy path and number of elements in the focussed partition (left). Multiple partitions can be selected while holding `Ctrl` and left-clicking with the mouse (right).
   </center>
 </p>
+
+Other interactions:
+- Use the `mouse wheel` to zoom, click the left `mouse button` and drag to pan and click the `mouse wheel` to reset the view
