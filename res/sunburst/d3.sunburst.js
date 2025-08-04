@@ -82,6 +82,7 @@ function sunburst_zoom(data, containerWidth, containerHeight)
     .attr("d", d => arc(d.current));
 
   // Make them clickable if they have children.
+  // TODO: selection must also be possible when there are no children
   path.filter(d => d.children)
     .style("cursor", "pointer")
     .on("click", dispatcher);
