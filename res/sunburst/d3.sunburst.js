@@ -188,13 +188,17 @@ function sunburst_static(data, containerWidth, containerHeight) {
         .attr("viewBox", [-radius, -radius, radius * 2, radius * 2])
         .style("max-width", "100%")
         .style("height", "auto")
-        .style("background", "white");
+        .style("background", "white")
+        .style("cursor", "move");
+
+    // Create a main group that will hold all chart elements (for zooming/panning)
+    const chartGroup = svg.append("g");
 
     // Add an arc for each element, with a title for tooltips.
     const format = d3.format(",d");
-    const pathGroup = svg.append("g");
 
-    const paths = pathGroup
+    const paths = chartGroup
+        .append("g") // Group for the paths
         .selectAll("path")
         .data(root.descendants().filter(d => d.depth))
         .join("path")
@@ -221,76 +225,12 @@ function sunburst_static(data, containerWidth, containerHeight) {
             }
         });
 
-    function selectOnClick(event, d) {
-            const isShiftClick = event.shiftKey;
-            const isAlreadySelected = selectedElements.has(d);
-
-            if (isShiftClick) {
-                // Shift+click: toggle this element in selection
-                if (isAlreadySelected) {
-                    // Remove from selection
-                    selectedElements.delete(d);
-                    d3.select(this)
-                        .attr("stroke", "white")
-                        .attr("stroke-width", 1)
-                        .style("filter", null);
-                } else {
-                    // Add to selection
-                    selectedElements.add(d);
-                    d3.select(this)
-                        .attr("stroke", "#333")
-                        .attr("stroke-width", 3)
-                        .style("filter", "brightness(1.1)");
-                }
-            } else {
-                // Normal click
-                if (isAlreadySelected && selectedElements.size === 1) {
-                    // If this is the only selected element, deselect it
-                    selectedElements.clear();
-                    d3.select(this)
-                        .attr("stroke", "white")
-                        .attr("stroke-width", 1)
-                        .style("filter", null);
-                } else {
-                    // Clear all selections and select this one
-                    selectedElements.clear();
-                    paths.attr("stroke", "white")
-                        .attr("stroke-width", 1)
-                        .style("filter", null);
-
-                    selectedElements.add(d);
-                    d3.select(this)
-                        .attr("stroke", "#333")
-                        .attr("stroke-width", 3)
-                        .style("filter", "brightness(1.1)");
-                }
-            }
-
-            // Trigger callbacks
-            if (selectedElements.size === 0) {
-                if (window.onSunburstDeselect) {
-                    window.onSunburstDeselect();
-                }
-            } else {
-                if (window.onSunburstSelect) {
-                    const selectedData = Array.from(selectedElements).map(d => d.data);
-                    window.onSunburstSelect(selectedData, Array.from(selectedElements));
-                }
-            }
-
-        const selectedClusterPaths = Array.from(selectedElements).map(d =>
-            d.ancestors().map(d => d.data.name).reverse()
-        );
-
-        notifyManiVaultAboutSelectedClusters(selectedClusterPaths);
-        }
-
     // Add tooltips
     paths.append("title")
         .text(d => `${d.ancestors().map(d => d.data.name).reverse().join("/")}\n${format(d.value)}`);
 
     // Add a label for each element.
-    svg.append("g")
+    const labels = chartGroup.append("g")
         .attr("pointer-events", "none")
         .attr("text-anchor", "middle")
         .attr("font-size", fontSize)
@@ -307,7 +247,96 @@ function sunburst_static(data, containerWidth, containerHeight) {
         .attr("fill", d => { return isColorDark(d.data.color) ? "white" : "black"; })
         .text(d => d.data.name);
 
+    // Define the zoom behavior
+    const zoom = d3.zoom()
+        .scaleExtent([1, 8]) // Min zoom 1x (original), max zoom 8x
+        .on("zoom", zoomed);
+
+    // Define the zoom event handler
+    function zoomed(event) {
+        const { transform } = event;
+        chartGroup.attr("transform", transform); // Apply transform to the main group
+    }
+
+    // Apply the zoom behavior to the SVG
+    svg.call(zoom);
+
+    // Implement the reset on middle-click
+    svg.on("mousedown", (event) => {
+        // Check for middle mouse button (button code 1)
+        if (event.button === 1) {
+            event.preventDefault(); // Prevent default browser action (e.g., autoscroll)
+            svg.transition()
+                .duration(500) // Smooth transition
+                .call(zoom.transform, d3.zoomIdentity); // Reset to original view
+        }
+    });
+
     // Add method to programmatically select/deselect
+    function selectOnClick(event, d) {
+        const isShiftClick = event.shiftKey;
+        const isAlreadySelected = selectedElements.has(d);
+
+        if (isShiftClick) {
+            // Shift+click: toggle this element in selection
+            if (isAlreadySelected) {
+                // Remove from selection
+                selectedElements.delete(d);
+                d3.select(this)
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 1)
+                    .style("filter", null);
+            } else {
+                // Add to selection
+                selectedElements.add(d);
+                d3.select(this)
+                    .attr("stroke", "#333")
+                    .attr("stroke-width", 3)
+                    .style("filter", "brightness(1.1)");
+            }
+        } else {
+            // Normal click
+            if (isAlreadySelected && selectedElements.size === 1) {
+                // If this is the only selected element, deselect it
+                selectedElements.clear();
+                d3.select(this)
+                    .attr("stroke", "white")
+                    .attr("stroke-width", 1)
+                    .style("filter", null);
+            } else {
+                // Clear all selections and select this one
+                selectedElements.clear();
+                paths.attr("stroke", "white")
+                    .attr("stroke-width", 1)
+                    .style("filter", null);
+
+                selectedElements.add(d);
+                d3.select(this)
+                    .attr("stroke", "#333")
+                    .attr("stroke-width", 3)
+                    .style("filter", "brightness(1.1)");
+            }
+        }
+
+        // Trigger callbacks
+        if (selectedElements.size === 0) {
+            if (window.onSunburstDeselect) {
+                window.onSunburstDeselect();
+            }
+        } else {
+            if (window.onSunburstSelect) {
+                const selectedData = Array.from(selectedElements).map(d => d.data);
+                window.onSunburstSelect(selectedData, Array.from(selectedElements));
+            }
+        }
+
+        const selectedClusterPaths = Array.from(selectedElements).map(d =>
+            d.ancestors().map(d => d.data.name).reverse()
+        );
+
+        notifyManiVaultAboutSelectedClusters(selectedClusterPaths);
+    }
+
     svg.node().selectPartition = function (dataName) {
         const targetPath = paths.filter(d => d.data.name === dataName);
         if (!targetPath.empty()) {
