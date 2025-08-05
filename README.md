@@ -41,3 +41,12 @@ To open the plot:
 
 Other interactions:
 - Use the `mouse wheel` to zoom, click the left `mouse button` and drag to pan and click the `mouse wheel` to reset the view
+- In the `Focus view` mode, only two hierarchy levels are shown. Clicking a partition will zoom into this part of the hierarchy. Select a partition with `Ctrl` + left `mouse button`. Move back to the overview by clicking the center. De-select all by `Ctrl` + clicking the center.
+
+<center>
+<video width="420" autoplay loop muted>
+  <source src="docs/figs/static_zoom_change.mp4" type="video/mp4" />
+</video>
+
+Switching between static overview and dynamic focus view will retain the selection.
+</center>
