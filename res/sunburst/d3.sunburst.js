@@ -111,20 +111,17 @@ function sunburst_zoom(data, containerWidth, containerHeight)
     .attr("pointer-events", "all")
     .on("click", (event, p) => {
       // Check if the Shift key is pressed
-      log("Click circle")
       if (event.shiftKey) {
-        log("Click circle + shift")
         // Prevent the zoom action and clear selection instead
         event.stopPropagation();
         clearSelection();
       } else {
-        log("Click ZOOM")
         // If Shift is not pressed, perform the default zoom-out action
         zoom(event, p);
       }
     });
 
-    //Click dispatcher to handle zoom vs. select ---
+  // Click dispatcher to handle zoom vs. select ---
   function dispatcher(event, p) {
     // If shift is held, select. Otherwise, zoom.
     if (event.shiftKey) {
