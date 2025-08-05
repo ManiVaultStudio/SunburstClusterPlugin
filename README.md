@@ -8,16 +8,15 @@ git clone git@github.com:ManiVaultStudio/SunburstClusterPlugin.git
 
 ![Sunburst plot](docs/figs/sunburstExample.png)
 
-<p align="middle">
+<p align="center">
   <img src="docs/figs/inputDialog.png" align="middle" width="60%" />
   <img src="docs/figs/dataHierarchy.png" align="middle" width="30%" /> 
-  <center>
-  Sunburst plot (top) based on a data hierarchy (bottom right). Hierarchy levels (clusters) can be selectively shown (bottom left). <small>Data: 
-<a href="https://alleninstitute.github.io/HMBA_BasalGanglia_Consensus_Taxonomy/">Mammalian Basal Ganglia Consensus Cell Type Atlas</a>
-</small>
-  </center>
 </p>
-
+<p align="center">
+  Sunburst plot (top) based on a data hierarchy (bottom right). Hierarchy levels (clusters) can be selectively shown (bottom left). <small>Data: 
+  <a href="https://alleninstitute.github.io/HMBA_BasalGanglia_Consensus_Taxonomy/">Mammalian Basal Ganglia Consensus Cell Type Atlas</a>
+</small>
+</p>
 
 ## How to use
 
@@ -31,13 +30,16 @@ To open the plot:
 - Right-click on the point data set in the data hierarchy, select `View` `->` `Sunburst plot`
 - OR: Open an empty sunburst plot via the main toolbar: `View` `->` `Sunburst plot` and drag a point data set (with cluster data children) into the plot widget
 
-<p align="middle">
+<p align="center">
   <img src="docs/figs/hoverExample.png" align="middle" width="56.55%" />
   <img src="docs/figs/selectionExample.png" align="middle" width="40%" /> 
-  <center>
+</p>
+<p align="center">
   Hovering over a partition will show a tooltip with the full hierarchy path and number of elements in the focussed partition (left). Multiple partitions can be selected while holding `Ctrl` and left-clicking with the mouse (right).
-  </center>
 </p>
 
 Other interactions:
 - Use the `mouse wheel` to zoom, click the left `mouse button` and drag to pan and click the `mouse wheel` to reset the view
+- In the `Focus view` mode, only two hierarchy levels are shown. Clicking a partition will zoom into this part of the hierarchy. Select a partition with `Ctrl` + left `mouse button`. Move back to the overview by clicking the center. De-select all by `Ctrl` + clicking the center. Switching between static overview and dynamic focus view will retain the selection.
+
+[Switching between static and focus view](https://github.com/user-attachments/assets/ba5d707c-d7c7-4717-9f2e-894fda62bf91)
