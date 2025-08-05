@@ -13,6 +13,12 @@ function isColorDark(hexColor) {
   return luminance < 0.5;
 }
 
+// State for selection, shared by sunburst_zoom and sunburst_static
+// TODO: react to selection from ManiVault like
+// window.selectedElements.add("cluster/class/group");
+// and either listen to these changes or explicitly call selection updates
+window.selectedElements = new Set();
+
 /**
  * Creates an interactive, zooming sunburst chart with selection capabilities.
  * - Click: Zooms into the clicked arc.
@@ -38,8 +44,11 @@ function sunburst_zoom(data, containerWidth, containerHeight)
   // Scale font size with radius
   const fontSize = Math.max(8, Math.min(12, radius / 40)); 
 
-  // State for selection
+  // State for selection (local cache)
   let selectedElements = new Set();
+
+  //Helper to get a unique, data-driven identifier for a node.
+  const getNodeIdentifier = d => d.ancestors().map(node => node.data.name).reverse().join("/");
 
   // We define the color based on the input data
   //const color = d3.scaleOrdinal(d3.quantize(d3.interpolateRainbow, data.children.length + 1));
@@ -121,6 +130,22 @@ function sunburst_zoom(data, containerWidth, containerHeight)
       }
     });
 
+  // On creation, check the global state and apply styles.
+  if (window.selectedElements && window.selectedElements.size > 0) {
+    path.each(function (d) {
+      const id = getNodeIdentifier(d);
+      if (window.selectedElements.has(id)) {
+        // Add the D3 node to our local cache for this instance
+        selectedElements.add(d);
+        // Apply the visual style
+        d3.select(this)
+          .attr("stroke", "#333")
+          .attr("stroke-width", 3)
+          .style("filter", "brightness(1.1)");
+      }
+    });
+  }
+
   // Click dispatcher to handle zoom vs. select
   function dispatcher(event, p) {
     // If shift is held, select. Otherwise, zoom.
@@ -136,7 +161,13 @@ function sunburst_zoom(data, containerWidth, containerHeight)
   // Selection logic
   function handleSelection(event, p, clearAll = false) {
     const clickedPath = d3.select(event.currentTarget);
+    const nodeId = getNodeIdentifier(p);
     const isAlreadySelected = selectedElements.has(p);
+
+    // Ensure global set exists
+    if (!window.selectedElements) {
+      window.selectedElements = new Set();
+    }
 
     if (clearAll) {
       // Visually deselect all paths
@@ -148,6 +179,11 @@ function sunburst_zoom(data, containerWidth, containerHeight)
       // Clear the selection set
       selectedElements.clear();
 
+      // Clear the global master state
+      if (window.selectedElements) {
+        window.selectedElements.clear();
+      }
+
       // Trigger the deselect callback
       if (window.onSunburstDeselect) {
         window.onSunburstDeselect();
@@ -157,6 +193,7 @@ function sunburst_zoom(data, containerWidth, containerHeight)
       if (isAlreadySelected) {
         // Deselect it
         selectedElements.delete(p);
+        window.selectedElements.delete(nodeId); // Update global state
         clickedPath
           .attr("stroke", "white")
           .attr("stroke-width", 1)
@@ -164,6 +201,7 @@ function sunburst_zoom(data, containerWidth, containerHeight)
       } else {
         // Select it
         selectedElements.add(p);
+        window.selectedElements.add(nodeId); // Update global state
         clickedPath
           .attr("stroke", "#333")
           .attr("stroke-width", 3)
@@ -183,7 +221,7 @@ function sunburst_zoom(data, containerWidth, containerHeight)
       }
     }
 
-    // Example of another callback/notification
+    // Format selection before passing it to ManiVault
     const selectedClusterPaths = Array.from(selectedElements).map(d =>
       d.ancestors().map(d => d.data.name).reverse()
     );
@@ -273,8 +311,11 @@ function sunburst_static(data, containerWidth, containerHeight) {
   // Scale font size with radius
   const fontSize = Math.max(8, Math.min(12, radius / 40)); 
 
-  // Track selected element
+  // State for selection (local cache)
   let selectedElements = new Set();
+
+  //Helper to get a unique, data-driven identifier for a node.
+  const getNodeIdentifier = d => d.ancestors().map(node => node.data.name).reverse().join("/");
 
   // Prepare the layout.
   const partition = data => d3.partition()
@@ -384,16 +425,39 @@ function sunburst_static(data, containerWidth, containerHeight) {
     }
   });
 
+  // On creation, check the global state and apply styles.
+  if (window.selectedElements && window.selectedElements.size > 0) {
+    paths.each(function (d) {
+      const id = getNodeIdentifier(d);
+      if (window.selectedElements.has(id)) {
+        // Add the D3 node to our local cache for this instance
+        selectedElements.add(d);
+        // Apply the visual style
+        d3.select(this)
+          .attr("stroke", "#333")
+          .attr("stroke-width", 3)
+          .style("filter", "brightness(1.1)");
+      }
+    });
+  }
+
     // Add method to programmatically select/deselect
   function selectOnClick(event, d) {
     const isShiftClick = event.shiftKey;
+    const nodeId = getNodeIdentifier(d);
     const isAlreadySelected = selectedElements.has(d);
+
+    // Ensure global set exists
+    if (!window.selectedElements) {
+      window.selectedElements = new Set();
+    }
 
     if (isShiftClick) {
       // Shift+click: toggle this element in selection
       if (isAlreadySelected) {
         // Remove from selection
         selectedElements.delete(d);
+        window.selectedElements.delete(nodeId); // Update global state
         d3.select(this)
           .attr("stroke", "white")
           .attr("stroke-width", 1)
@@ -401,6 +465,7 @@ function sunburst_static(data, containerWidth, containerHeight) {
       } else {
         // Add to selection
         selectedElements.add(d);
+        window.selectedElements.add(nodeId); // Update global state
         d3.select(this)
           .attr("stroke", "#333")
           .attr("stroke-width", 3)
@@ -411,6 +476,12 @@ function sunburst_static(data, containerWidth, containerHeight) {
       if (isAlreadySelected && selectedElements.size === 1) {
         // If this is the only selected element, deselect it
         selectedElements.clear();
+
+        // Clear the global master state
+        if (window.selectedElements) {
+          window.selectedElements.clear();
+        }
+
         d3.select(this)
           .attr("stroke", "white")
           .attr("stroke-width", 1)
@@ -418,11 +489,19 @@ function sunburst_static(data, containerWidth, containerHeight) {
       } else {
         // Clear all selections and select this one
         selectedElements.clear();
+
+        // Clear the global master state
+        if (window.selectedElements) {
+          window.selectedElements.clear();
+        }
+
         paths.attr("stroke", "white")
           .attr("stroke-width", 1)
           .style("filter", null);
 
         selectedElements.add(d);
+        window.selectedElements.add(nodeId); // Update global state
+
         d3.select(this)
           .attr("stroke", "#333")
           .attr("stroke-width", 3)
