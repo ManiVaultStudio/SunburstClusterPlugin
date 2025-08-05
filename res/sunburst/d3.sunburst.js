@@ -114,14 +114,14 @@ function sunburst_zoom(data, containerWidth, containerHeight)
       if (event.shiftKey) {
         // Prevent the zoom action and clear selection instead
         event.stopPropagation();
-        clearSelection();
+        handleSelection(event, p, true);
       } else {
         // If Shift is not pressed, perform the default zoom-out action
         zoom(event, p);
       }
     });
 
-  // Click dispatcher to handle zoom vs. select ---
+  // Click dispatcher to handle zoom vs. select
   function dispatcher(event, p) {
     // If shift is held, select. Otherwise, zoom.
     if (event.shiftKey) {
@@ -133,25 +133,42 @@ function sunburst_zoom(data, containerWidth, containerHeight)
     }
   }
 
-  // Selection logic ---
-  function handleSelection(event, p) {
+  // Selection logic
+  function handleSelection(event, p, clearAll = false) {
     const clickedPath = d3.select(event.currentTarget);
     const isAlreadySelected = selectedElements.has(p);
 
-    if (isAlreadySelected) {
-      // Deselect it
-      selectedElements.delete(p);
-      clickedPath
+    if (clearAll) {
+      // Visually deselect all paths
+      path.filter(d => selectedElements.has(d))
         .attr("stroke", "white")
         .attr("stroke-width", 1)
         .style("filter", null);
-    } else {
-      // Select it
-      selectedElements.add(p);
-      clickedPath
-        .attr("stroke", "#333")
-        .attr("stroke-width", 3)
-        .style("filter", "brightness(1.1)");
+
+      // Clear the selection set
+      selectedElements.clear();
+
+      // Trigger the deselect callback
+      if (window.onSunburstDeselect) {
+        window.onSunburstDeselect();
+      }
+    }
+    else {
+      if (isAlreadySelected) {
+        // Deselect it
+        selectedElements.delete(p);
+        clickedPath
+          .attr("stroke", "white")
+          .attr("stroke-width", 1)
+          .style("filter", null);
+      } else {
+        // Select it
+        selectedElements.add(p);
+        clickedPath
+          .attr("stroke", "#333")
+          .attr("stroke-width", 3)
+          .style("filter", "brightness(1.1)");
+      }
     }
 
     // Trigger external callbacks based on selection state
@@ -223,32 +240,6 @@ function sunburst_zoom(data, containerWidth, containerHeight)
     const y = (d.y0 + d.y1) / 2 * radius;
     return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
   }
-
-  // Method to programmatically clear selection ---
-  function clearSelection() {
-    if (selectedElements.size > 0) {
-      // Visually deselect all paths
-      path.filter(d => selectedElements.has(d))
-        .attr("stroke", "white")
-        .attr("stroke-width", 1)
-        .style("filter", null);
-
-      // Clear the selection set
-      selectedElements.clear();
-
-      // Trigger the deselect callback
-      if (window.onSunburstDeselect) {
-        window.onSunburstDeselect();
-      }
-
-      // TODO: this should be handled without code duplication
-      const selectedClusterPaths = Array.from(selectedElements).map(d =>
-        d.ancestors().map(d => d.data.name).reverse()
-      );
-
-      notifyManiVaultAboutSelectedClusters(selectedClusterPaths);
-    }
-  };
 
   return svg.node();
 }
