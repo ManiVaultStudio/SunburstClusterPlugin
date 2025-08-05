@@ -88,11 +88,7 @@ function sunburst_zoom(data, containerWidth, containerHeight)
     .attr("pointer-events", d => arcVisible(d.current) ? "auto" : "none")
     .attr("stroke", "white")
     .attr("stroke-width", 1)
-    .attr("d", d => arc(d.current));
-
-  // Make them clickable if they have children.
-  // TODO: selection must also be possible when there are no children
-  path.filter(d => d.children)
+    .attr("d", d => arc(d.current))
     .style("cursor", "pointer")
     .on("click", dispatcher);
 
@@ -154,7 +150,10 @@ function sunburst_zoom(data, containerWidth, containerHeight)
       event.stopPropagation();
       handleSelection(event, p);
     } else {
+      // Zoom is only allowed if the clicked node has children.
+      if (p.children) {
         zoom(event, p);
+      }
     }
   }
 
