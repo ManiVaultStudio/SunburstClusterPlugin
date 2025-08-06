@@ -371,13 +371,18 @@ void SunburstClusterPlugin::fromVariantMap(const QVariantMap& variantMap)
         _currentClusterDataSets.emplace_back(mv::data().getDataset<Clusters>(clusterDataGuid));
     }
 
-    // capture the connection by value and define a mutable lambda which removes the connection
-    QMetaObject::Connection conn;
-    conn = QObject::connect(_sunburstWidget, &gui::WebWidget::webPageFullyLoaded, [this, conn]() mutable {
+    if (_sunburstWidget->isWebPageLoaded()) { // ideally we'd also cheeck _communicationAvailable from gui::WebWidget
+      loadDataImpl();
+    }
+    else {
+      // capture the connection by value and define a mutable lambda which removes the connection
+      QMetaObject::Connection conn;
+      conn = QObject::connect(_sunburstWidget, &gui::WebWidget::webPageFullyLoaded, [this, conn]() mutable {
         // Disconnect this connection
         QObject::disconnect(conn);
         loadDataImpl();
         });
+    }
 }
 
 QVariantMap SunburstClusterPlugin::toVariantMap() const
