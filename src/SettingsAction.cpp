@@ -10,7 +10,7 @@ using namespace mv::gui;
 SunburstSettings::SunburstSettings(QObject* parent) :
     WidgetAction(parent, "Sunburst settings"),
     _dataNameAction(this, "Dataset"),
-    _sunburstPlotZoomOption(this, "Zoom on click", false),
+    _sunburstPlotZoomOption(this, "Focus view", false),
     _crossLevelSelectionOption(this, "Select in base data", false),
     _pointDataSetGUID(this, "Points data set GUI"),
     _clusterDataSetsGUID(this, "Cluster data sets GUI")
@@ -21,6 +21,7 @@ SunburstSettings::SunburstSettings(QObject* parent) :
     _dataNameAction.setDefaultWidgetFlags(StringAction::WidgetFlag::Label);
 
     _crossLevelSelectionOption.setToolTip("Select in base point data instead of cluster data.\nThis will NOT publish cluster selections but individual points.");
+    _sunburstPlotZoomOption.setToolTip("Click to zoom and focus and a partition.");
 }
 
 void SunburstSettings::fromVariantMap(const QVariantMap& variantMap)
