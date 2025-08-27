@@ -335,16 +335,17 @@ function sunburst_static(data, containerWidth, containerHeight) {
 
   // Create the SVG container
   const svg = d3.create("svg")
-    .attr("width", radius * 2)
-    .attr("height", radius * 2)
-    .attr("viewBox", [-radius, -radius, radius * 2, radius * 2])
+    .attr("width", availableWidth)
+    .attr("height", availableHeight)
+    .attr("viewBox", [0, 0, availableWidth, availableHeight])
     .style("max-width", "100%")
     .style("height", "auto")
     .style("background", "white")
     .style("cursor", "move");
 
   // Create a main group that will hold all chart elements (for zooming/panning)
-  const chartGroup = svg.append("g");
+  const chartGroup = svg.append("g")
+    .attr("transform", `translate(${availableWidth / 2},${availableHeight / 2})`);
 
   // Add an arc for each element, with a title for tooltips.
   const format = d3.format(",d");
@@ -410,8 +411,19 @@ function sunburst_static(data, containerWidth, containerHeight) {
     chartGroup.attr("transform", transform); // Apply transform to the main group
   }
 
+  // Reset to original view
+  function defaultZoomTransform() {
+    return d3.zoomIdentity.translate(availableWidth / 2, availableHeight / 2).scale(1);
+  }
+
   // Apply the zoom behavior to the SVG
   svg.call(zoom);
+
+  // Set the zoom's internal state to match the initial transform:
+  svg.call(
+    zoom.transform,
+    defaultZoomTransform()
+  );
 
   // Implement the reset on middle-click
   svg.on("mousedown", (event) => {
@@ -420,7 +432,7 @@ function sunburst_static(data, containerWidth, containerHeight) {
       event.preventDefault(); // Prevent default browser action (e.g., autoscroll)
       svg.transition()
         .duration(500) // Smooth transition
-        .call(zoom.transform, d3.zoomIdentity); // Reset to original view
+        .call(zoom.transform, defaultZoomTransform()); // Reset to original view
     }
   });
 
