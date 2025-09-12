@@ -23,12 +23,7 @@ public:
     SunburstSettings(QObject* parent);
 
 private slots:
-
     void onLoadDims();
-
-public slots:
-    void onApplyClamping();
-    void onApplyDimensionFiltering();
 
 public: // Action getters
 
