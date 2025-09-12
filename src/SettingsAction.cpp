@@ -71,7 +71,7 @@ SunburstSettings::Widget::Widget(QWidget* parent, SunburstSettings* settingsActi
 
     layout->addWidget(settingsAction->getPlotZoomOption().createWidget(this));
     layout->addSpacing(4);
-    layout->addWidget(settingsAction->getCrossLevelSelectionOption().createWidget(this));
+    //layout->addWidget(settingsAction->getCrossLevelSelectionOption().createWidget(this));
     layout->addStretch(1);
 
     setLayout(layout);
