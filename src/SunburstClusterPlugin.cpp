@@ -31,7 +31,7 @@ using namespace mv;
 // View
 // =============================================================================
 
-SunburstClusterPlugin::SunburstClusterPlugin(const PluginFactory* factory) :
+SunburstClusterPlugin::SunburstClusterPlugin(const mv::plugin::PluginFactory* factory) :
     ViewPlugin(factory),
     _sunburstWidget(new SunburstWidget()),
     _settingsWidget(new SunburstSettings(this)),
