@@ -35,11 +35,11 @@ To open the plot:
   <img src="docs/figs/selectionExample.png" align="middle" width="40%" /> 
 </p>
 <p align="center">
-  Hovering over a partition will show a tooltip with the full hierarchy path and number of elements in the focussed partition (left). Multiple partitions can be selected while holding `Ctrl` and left-clicking with the mouse (right).
+  Hovering over a partition will show a tooltip with the full hierarchy path and number of elements in the focussed partition (left). Multiple partitions can be selected while holding `Shift` and left-clicking with the mouse (right).
 </p>
 
 Other interactions:
 - Use the `mouse wheel` to zoom, click the left `mouse button` and drag to pan and click the `mouse wheel` to reset the view
-- In the `Focus view` mode, only two hierarchy levels are shown. Clicking a partition will zoom into this part of the hierarchy. Select a partition with `Ctrl` + left `mouse button`. Move back to the overview by clicking the center. De-select all by `Ctrl` + clicking the center. Switching between static overview and dynamic focus view will retain the selection.
+- In the `Focus view` mode, only two hierarchy levels are shown. Clicking a partition will zoom into this part of the hierarchy. Select a partition with `Shift` + left `mouse button`. Move back to the overview by clicking the center. De-select all by `Shift` + clicking the center. Switching between static overview and dynamic focus view will retain the selection.
 
 [Switching between static and focus view](https://github.com/user-attachments/assets/ba5d707c-d7c7-4717-9f2e-894fda62bf91)
